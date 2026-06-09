@@ -1,6 +1,6 @@
 # Toplu Mesajlaşma Platformu
 
-ASP.NET Core Web API (.NET 7) + SQL Server + SignalR ile geliştirilmiş toplu mesajlaşma platformu.
+ASP.NET Core Web API (.NET 8) + SQL Server + SignalR ile geliştirilmiş toplu mesajlaşma platformu.
 
 ## Özellikler
 
@@ -11,46 +11,50 @@ ASP.NET Core Web API (.NET 7) + SQL Server + SignalR ile geliştirilmiş toplu m
   - Tüm üyelerle birebir mesajlaşma
   - Mesaj grupları oluşturma
   - Gruplara toplu mesaj gönderme
-  - Grup üyelerini yönetme
-- **SignalR** ile gerçek zamanlı mesaj bildirimleri
+  - Grup üyelerini yönetme (ekle / çıkar)
+- **Üyeler**, kendilerine gelen mesajlara yöneticiye yanıt verebilir
+- **Mesaj silme** — bir mesajı gönderen kişi veya Admin silebilir (birebir ve grup)
+- **SignalR** ile gerçek zamanlı mesaj ve silme bildirimleri
 - **Swagger UI** ile API dokümantasyonu
 
 ## Teknoloji Yığını
 
 | Katman | Teknoloji |
 |--------|-----------|
-| Backend | ASP.NET Core Web API .NET 7 |
+| Backend | ASP.NET Core Web API .NET 8 |
 | Veritabanı | SQL Server (LocalDB) |
-| ORM | Entity Framework Core 7 |
+| ORM | Entity Framework Core 8 |
 | Kimlik | ASP.NET Identity |
 | Auth | JWT Bearer Token |
 | Gerçek Zamanlı | SignalR |
 | Dok. | Swagger / OpenAPI |
 
-## Kurulum
+## Kurulum ve Çalıştırma
 
 ### 1. Gereksinimler
-- .NET 7 SDK
-- SQL Server / LocalDB
+- .NET 8 SDK
+- SQL Server LocalDB (Visual Studio ile birlikte gelir) veya SQL Server Express
 
 ### 2. Veritabanı ayarı
 
-`appsettings.json` dosyasındaki connection string'i düzenleyin:
+Varsayılan bağlantı LocalDB kullanır, `appsettings.json` içinde tanımlıdır:
 
 ```json
 "ConnectionStrings": {
-  "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=MessagingPlatformDb;Trusted_Connection=True;"
+  "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=MessagingPlatformDb;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=true"
 }
 ```
 
-### 3. Migration & Çalıştırma
+> SQL Server Express kullanıyorsanız `Server` kısmını kendi instance adınızla değiştirin, örn. `Server=.\\SQLEXPRESS`.
+
+### 3. Çalıştırma
 
 ```bash
 cd MessagingPlatform
-dotnet ef migrations add InitialCreate
-dotnet ef database update
 dotnet run
 ```
+
+Veritabanı **ilk çalıştırmada otomatik oluşturulur** (migration'lar uygulanır) ve örnek kullanıcılarla doldurulur. Ayrıca elle migration komutu çalıştırmanıza gerek yoktur.
 
 Uygulama çalıştıktan sonra:
 
@@ -83,15 +87,16 @@ Uygulama çalıştıktan sonra:
 |--------|----------|-------|
 | GET | `/api/users` | Admin |
 | GET | `/api/users/members` | Admin |
+| GET | `/api/users/admins` | Authenticated |
 | GET | `/api/users/{id}` | Authenticated |
 
 ### Mesajlar (Birebir)
 | Method | Endpoint | Yetki |
 |--------|----------|-------|
-| POST | `/api/messages` | Admin |
-| GET | `/api/messages` | Admin |
-| GET | `/api/messages/conversation/{userId}` | Admin |
+| POST | `/api/messages` | Authenticated (üye yalnızca admine) |
+| GET | `/api/messages/conversation/{userId}` | Authenticated |
 | GET | `/api/messages/my` | Authenticated |
+| DELETE | `/api/messages/{id}` | Gönderen veya Admin |
 
 ### Gruplar
 | Method | Endpoint | Yetki |
@@ -103,15 +108,18 @@ Uygulama çalıştıktan sonra:
 | DELETE | `/api/groups/{id}/members/{userId}` | Admin |
 | POST | `/api/groups/{id}/messages` | Admin |
 | GET | `/api/groups/{id}/messages` | Authenticated |
+| DELETE | `/api/groups/{groupId}/messages/{messageId}` | Gönderen veya Admin |
 | DELETE | `/api/groups/{id}` | Admin |
 
 ## SignalR Hub
 
-**Endpoint:** `wss://localhost:5001/hubs/chat?access_token={jwt_token}`
+**Endpoint:** `/hubs/chat?access_token={jwt_token}`
 
 ### İstemci Olayları (dinle)
 - `ReceiveMessage` — Birebir mesaj geldiğinde
 - `ReceiveGroupMessage` — Grup mesajı geldiğinde
+- `MessageDeleted` — Birebir mesaj silindiğinde
+- `GroupMessageDeleted` — Grup mesajı silindiğinde
 
 ### Sunucuya Çağrı
 - `JoinGroup(groupId)` — Gruba katıl
