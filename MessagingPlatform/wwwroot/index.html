@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Toplu Mesajlaşma Platformu</title>
+    <link rel="stylesheet" href="css/style.css?v=3" />
+</head>
+<body>
+
+    <!-- ─── GİRİŞ EKRANI ─────────────────────────────────────────── -->
+    <div id="login-screen" class="login-screen">
+        <div class="login-card">
+            <div class="login-logo">
+                <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+            </div>
+            <h1>Mesajlaşma Platformu</h1>
+            <p class="login-subtitle">Devam etmek için giriş yapın</p>
+
+            <div id="login-error" class="alert alert-error hidden"></div>
+
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-email">E-posta</label>
+                    <input type="email" id="login-email" value="admin@messaging.com" required />
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Şifre</label>
+                    <input type="password" id="login-password" value="Admin123!" required />
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Giriş Yap</button>
+            </form>
+
+            <div class="login-hint">
+                <strong>Demo Hesaplar:</strong><br />
+                Admin: admin@messaging.com / Admin123!<br />
+                Üye: ali@example.com / User123!
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── ANA UYGULAMA ─────────────────────────────────────────── -->
+    <div id="app-screen" class="app-screen hidden">
+        <!-- Üst Bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span class="topbar-title">Mesajlaşma Platformu</span>
+            </div>
+            <div class="topbar-right">
+                <span id="current-user" class="current-user"></span>
+                <span id="user-badge" class="badge"></span>
+                <span id="conn-status" class="conn-status" title="Bağlantı durumu"></span>
+                <button id="logout-btn" class="btn btn-ghost btn-sm">Çıkış</button>
+            </div>
+        </header>
+
+        <div class="main-layout">
+            <!-- Sol Kenar Çubuğu -->
+            <aside class="sidebar">
+                <div class="sidebar-tabs">
+                    <button class="tab-btn active" data-tab="members">Üyeler</button>
+                    <button class="tab-btn" data-tab="groups">Gruplar</button>
+                </div>
+
+                <!-- Üyeler Sekmesi -->
+                <div id="tab-members" class="tab-content active">
+                    <div class="sidebar-list" id="members-list">
+                        <div class="empty-hint">Yükleniyor...</div>
+                    </div>
+                </div>
+
+                <!-- Gruplar Sekmesi -->
+                <div id="tab-groups" class="tab-content">
+                    <button id="new-group-btn" class="btn btn-primary btn-block btn-sm" style="margin-bottom:10px;">
+                        + Yeni Grup Oluştur
+                    </button>
+                    <div class="sidebar-list" id="groups-list">
+                        <div class="empty-hint">Yükleniyor...</div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Sohbet / İçerik Alanı -->
+            <main class="content">
+                <!-- Boş Durum -->
+                <div id="empty-state" class="empty-state">
+                    <svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <p>Mesajlaşmaya başlamak için bir üye veya grup seçin</p>
+                </div>
+
+                <!-- Sohbet Görünümü -->
+                <div id="chat-view" class="chat-view hidden">
+                    <div class="chat-header">
+                        <div>
+                            <h2 id="chat-title"></h2>
+                            <span id="chat-subtitle" class="chat-subtitle"></span>
+                        </div>
+                        <div id="chat-actions" class="chat-actions"></div>
+                    </div>
+                    <div id="messages-container" class="messages-container"></div>
+                    <form id="message-form" class="message-form">
+                        <input type="text" id="message-input" placeholder="Mesajınızı yazın..." autocomplete="off" />
+                        <button type="submit" class="btn btn-primary">Gönder</button>
+                    </form>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- ─── YENİ GRUP MODAL ──────────────────────────────────────── -->
+    <div id="group-modal" class="modal-overlay hidden">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Yeni Mesaj Grubu</h3>
+                <button class="modal-close" data-close-modal>&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="group-name">Grup Adı</label>
+                    <input type="text" id="group-name" placeholder="Örn: 1. Sınıf Öğrencileri" />
+                </div>
+                <div class="form-group">
+                    <label for="group-desc">Açıklama</label>
+                    <input type="text" id="group-desc" placeholder="İsteğe bağlı" />
+                </div>
+                <div class="form-group">
+                    <label>Üyeler</label>
+                    <div id="group-member-picker" class="member-picker"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" data-close-modal>İptal</button>
+                <button id="create-group-confirm" class="btn btn-primary">Oluştur</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── GRUP ÜYE YÖNETİM MODAL ───────────────────────────────── -->
+    <div id="manage-modal" class="modal-overlay hidden">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Grup Üyelerini Yönet</h3>
+                <button class="modal-close" data-close-modal>&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Üye ekle / çıkar</label>
+                    <div id="manage-member-picker" class="member-picker"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" data-close-modal>Kapat</button>
+                <button id="save-members-confirm" class="btn btn-primary">Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast bildirimleri -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
+    <script src="js/api.js?v=3"></script>
+    <script src="js/app.js?v=3"></script>
+</body>
+</html>
