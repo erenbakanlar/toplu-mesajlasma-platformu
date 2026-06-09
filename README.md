@@ -2,6 +2,8 @@
 
 ASP.NET Core Web API (.NET 8) + SQL Server + SignalR ile geliştirilmiş toplu mesajlaşma platformu.
 
+> **Not:** Veritabanı bağlantısı varsayılan olarak **SQL Server Express** (`Server=.\SQLEXPRESS`) için ayarlıdır. Farklı bir SQL Server instance kullanıyorsanız (ör. `(localdb)\mssqllocaldb` veya `localhost`), `MessagingPlatform/appsettings.json` içindeki `Server` değerini kendi sunucunuza göre değiştirin. Veritabanı ilk çalıştırmada otomatik oluşturulur.
+
 ## Özellikler
 
 - **Web Arayüzü (SPA)** — `wwwroot` içinde, vanilla JS + SignalR ile entegre
@@ -33,19 +35,19 @@ ASP.NET Core Web API (.NET 8) + SQL Server + SignalR ile geliştirilmiş toplu m
 
 ### 1. Gereksinimler
 - .NET 8 SDK
-- SQL Server LocalDB (Visual Studio ile birlikte gelir) veya SQL Server Express
+- SQL Server Express (veya LocalDB / başka bir SQL Server instance)
 
 ### 2. Veritabanı ayarı
 
-Varsayılan bağlantı LocalDB kullanır, `appsettings.json` içinde tanımlıdır:
+Bağlantı dizesi `appsettings.json` içinde tanımlıdır, varsayılan olarak SQL Server Express kullanır:
 
 ```json
 "ConnectionStrings": {
-  "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=MessagingPlatformDb;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=true"
+  "DefaultConnection": "Server=.\\SQLEXPRESS;Database=MessagingPlatformDb;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=true"
 }
 ```
 
-> SQL Server Express kullanıyorsanız `Server` kısmını kendi instance adınızla değiştirin, örn. `Server=.\\SQLEXPRESS`.
+> Kendi ortamınıza göre `Server` değerini değiştirebilirsiniz: LocalDB için `Server=(localdb)\\mssqllocaldb`, varsayılan instance için `Server=localhost`.
 
 ### 3. Çalıştırma
 
