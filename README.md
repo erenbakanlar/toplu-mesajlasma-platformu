@@ -1,6 +1,6 @@
 # Toplu Mesajlaşma Platformu
 
-ASP.NET Core Web API (.NET 8) + SQL Server + SignalR ile geliştirilmiş toplu mesajlaşma platformu.
+ASP.NET Core Web API (.NET 7) + SQL Server + SignalR ile geliştirilmiş toplu mesajlaşma platformu.
 
 > **Not:** Veritabanı bağlantısı varsayılan olarak **SQL Server Express** (`Server=.\SQLEXPRESS`) için ayarlıdır. Farklı bir SQL Server instance kullanıyorsanız (ör. `(localdb)\mssqllocaldb` veya `localhost`), `MessagingPlatform/appsettings.json` içindeki `Server` değerini kendi sunucunuza göre değiştirin. Veritabanı ilk çalıştırmada otomatik oluşturulur.
 
@@ -23,9 +23,9 @@ ASP.NET Core Web API (.NET 8) + SQL Server + SignalR ile geliştirilmiş toplu m
 
 | Katman | Teknoloji |
 |--------|-----------|
-| Backend | ASP.NET Core Web API .NET 8 |
+| Backend | ASP.NET Core Web API .NET 7 |
 | Veritabanı | SQL Server (LocalDB) |
-| ORM | Entity Framework Core 8 |
+| ORM | Entity Framework Core 7 |
 | Kimlik | ASP.NET Identity |
 | Auth | JWT Bearer Token |
 | Gerçek Zamanlı | SignalR |
@@ -34,7 +34,7 @@ ASP.NET Core Web API (.NET 8) + SQL Server + SignalR ile geliştirilmiş toplu m
 ## Kurulum ve Çalıştırma
 
 ### 1. Gereksinimler
-- .NET 8 SDK
+- .NET 7 SDK
 - SQL Server Express (veya LocalDB / başka bir SQL Server instance)
 
 ### 2. Veritabanı ayarı
